@@ -1,53 +1,62 @@
 <!DOCTYPE html>
 <html>
-<head>
-	<title> Home Page</title>
-</head>
-<body>
-	<h1>Results</h1>
-	<header>
-		<ul>
-			<a href="index.html">Home</a>
-			<a href="players.html">Players</a>
-			<a href="rosters.html">Rosters</a>
-			<a href="teams.html">Teams</a>
-			<a href="matchdays.html">MatchDays</a>
-		</ul>
-	</header>
-	<div>
-		<h2>Overview</h2>
-		<p>This is where result information will be populated. This page will include a client side interaction to enter team 1 and team 2 results, as well as the over all winner (autopopulated based on score). This information will be used on the league table to calculate the current points each team has.</p>
-	</div>
+  <head>
+    <title>Home Page</title>
+  </head>
+  <body>
+    <h1>Results</h1>
+    <header>
+      <ul>
+        <a href="index.html">Home</a>
+        <a href="players.html">Players</a>
+        <a href="rosters.html">Rosters</a>
+        <a href="teams.html">Teams</a>
+        <a href="results.html">Results</a>
+        <a href="matchdays.html">Results</a>
+      </ul>
+    </header>
+    <div>
+      <h2>Overview</h2>
+      <p>
+        This is where result information will be populated. This page will
+        include a client side interaction to enter team 1 and team 2 results, as
+        well as the over all winner (autopopulated based on score). This
+        information will be used on the league table to calculate the current
+        points each team has.
+      </p>
+    </div>
 
-		<h3>Add Result</h3>
-		<form action="/action_page.php">
-   			<label for="fname">Matchday ID: </label>
-   			<input type="text" id="fname" name="team">
-   			<label for="fname">Team 1 Score: </label>
-   			<input type="text" id="fname" name="team">
-   			<label for="lname">Team 2 Score: </label>
-   			<input type="text" id="lname" name="roster">
-   			<input type="submit" value="Submit Result">
-		</form> 
+    <h3>Add Result</h3>
+    <form action="/action_page.php">
+      <label for="fname">Matchday ID: </label>
+      <input type="text" id="fname" name="team" />
+      <label for="fname">Team 1 Score: </label>
+      <input type="text" id="fname" name="team" />
+      <label for="lname">Team 2 Score: </label>
+      <input type="text" id="lname" name="roster" />
+      <input type="submit" value="Submit Result" />
+    </form>
 
-	<h3>Current Results</h3>
-	<div>
-		<table>
-			<tr>
-				<th>Team Name</th>
-				<th>Goals Scored</th>
-				<th>Current Points</th>
-			</tr>
-			<td>Liverpool</td>
-			<td>49</td>
-			<td>32</td>
-			<tr>
-				<td>Manchester United</td>	
-				<td>16</td>
-				<td>42</td>	
-			</tr>
-			<td>Leicester City</td>
-			<td>12</td>
-			<td>36</td>
-		</table>
-	</div>
+    <h3>Current Results</h3>
+    <div>
+      <table>
+        <tr>
+          <th>Team Name</th>
+          <th>Goals Scored</th>
+          <th>Current Points</th>
+        </tr>
+        <td>Liverpool</td>
+        <td>49</td>
+        <td>32</td>
+        <tr>
+          <td>Manchester United</td>
+          <td>16</td>
+          <td>42</td>
+        </tr>
+        <td>Leicester City</td>
+        <td>12</td>
+        <td>36</td>
+      </table>
+    </div>
+  </body>
+</html>

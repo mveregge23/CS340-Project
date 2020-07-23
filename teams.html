@@ -1,47 +1,52 @@
 <!DOCTYPE html>
 <html>
-<head>
-	<title>Teams</title>
-</head>
-<body>
-	<h1>Teams Page</h1>
-	<header>
-		<ul>
-			<a href="index.html">Home</a>
-			<a href="players.html">Players</a>
-			<a href="rosters.html">Rosters</a>
-			<a href="matchdays.html">MatchDays</a>
-			<a href="results.html">Results</a>
-		</ul>
-	</header>
-	<div>
-		<h2>Overview</h2>
-		<p>This is where all team information will exist. On this page there will be the ability to add teams line by line, as well as adding the associated roster and viewing the current list of teams associated with this league. Team names can be removed using the teams table.</p>
-	</div>
-	<div>
-		<h3>Teams</h3>
-		<form action="/action_page.php">
-   			<label for="fname">Team Name: </label>
-   			<input type="text" id="fname" name="team">
-   			<label for="lname">Roster: </label>
-   			<input type="text" id="lname" name="roster">
-   			<input type="submit" value="Add Team">
-		</form> 
-	</div>
-	<h3>Current Teams</h3>
-		<table>
-		<tr>
-			<th>Team Name</th>
-
-		</tr>
-		<td>Liverpool</td>
-		<td><button>Remove</button></td>
-		<tr>
-			<td>Manchester United</td>	
-			<td><button>Remove</button></td>
-		</tr>
-		<td>Leicester City</td>
-		<td><button>Remove</button></td>
-		</table>
-</body>
+  <head>
+    <title>Teams</title>
+  </head>
+  <body>
+    <h1>Teams Page</h1>
+    <header>
+      <ul>
+        <a href="index.html">Home</a>
+        <a href="players.html">Players</a>
+        <a href="rosters.html">Rosters</a>
+        <a href="teams.html">Teams</a>
+        <a href="results.html">Results</a>
+        <a href="matchdays.html">Results</a>
+      </ul>
+    </header>
+    <div>
+      <h2>Overview</h2>
+      <p>
+        This is where all team information will exist. On this page there will
+        be the ability to add teams line by line, as well as adding the
+        associated roster and viewing the current list of teams associated with
+        this league. Team names can be removed using the teams table.
+      </p>
+    </div>
+    <div>
+      <h3>Teams</h3>
+      <form action="/action_page.php">
+        <label for="fname">Team Name: </label>
+        <input type="text" id="fname" name="team" />
+        <label for="lname">Roster: </label>
+        <input type="text" id="lname" name="roster" />
+        <input type="submit" value="Add Team" />
+      </form>
+    </div>
+    <h3>Current Teams</h3>
+    <table>
+      <tr>
+        <th>Team Name</th>
+      </tr>
+      <td>Liverpool</td>
+      <td><button>Remove</button></td>
+      <tr>
+        <td>Manchester United</td>
+        <td><button>Remove</button></td>
+      </tr>
+      <td>Leicester City</td>
+      <td><button>Remove</button></td>
+    </table>
+  </body>
 </html>
