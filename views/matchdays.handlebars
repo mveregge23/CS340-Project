@@ -1,0 +1,65 @@
+<h1>Matchdays</h1>
+<div>
+  <h2>Overview</h2>
+  <p>
+    This is where matches are scheduled and the list of upcoming matches is
+    display. The goal of this page will be to have dynamically updated team
+    option lists based on the current teams that exist within the database.
+    these teams will be able to be scheduled against eachother, with a
+    calendar option also to set the match date.Matchdays can be removed
+    using the included buttons as well
+  </p>
+</div>
+<h3>Current Matchdays</h3>
+<div>
+  <label for="team1">Team1: </label>
+  <select id="team1">
+    <option value="team1">team 1</option>
+    <option value="team2">team 2</option>
+    <option value="team3">team 3</option>
+    <option value="team4">team 4</option>
+  </select>
+
+  <label for="team2">Team 2: </label>
+
+  <select id="team2">
+    <option value="team1">team 1</option>
+    <option value="team2">team 2</option>
+    <option value="team3">team 3</option>
+    <option value="team4">team 4</option>
+  </select>
+  <form action="">
+    <label for="matchDate">Match Date:</label>
+    <input type="date" id="matchDate" name="matchDate" />
+    <input type="submit" value="Add Matchday" />
+  </form>
+</div>
+<h3>Current Schedule</h3>
+<table>
+  <tr>
+    <th>Date</th>
+    <th>Home</th>
+    <th>Away</th>
+  </tr>
+  <tr>
+    <td>08/19/20</td>
+    <td>Manchester United</td>
+    <td>vs</td>
+    <td>Leicester City</td>
+    <td><button>Remove</button></td>
+  </tr>
+  <tr>
+    <td>08/22/20</td>
+    <td>Liverpool</td>
+    <td>vs</td>
+    <td>Manchester United</td>
+    <td><button>Remove</button></td>
+  </tr>
+  <tr>
+    <td>08/26/20</td>
+    <td>Liverpool</td>
+    <td>vs</td>
+    <td>Manchester United</td>
+    <td><button>Remove</button></td>
+  </tr>
+</table>
