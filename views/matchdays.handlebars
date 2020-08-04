@@ -57,7 +57,7 @@
     <td><select name="team2" disabled>
         <option value="">Select a Team</option>
         {{#each @root.teams}}
-        <option value="{{this.teamId}}" {{selected this.teamId ../this.teamId1}}>{{this.teamName}}</option>
+        <option value="{{this.teamId}}" {{selected this.teamId ../this.teamId2}}>{{this.teamName}}</option>
         {{/each}}
       </select></td>
     <input type="hidden" name="matchdayId" value="{{this.matchdayId}}" disabled>

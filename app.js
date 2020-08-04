@@ -101,6 +101,19 @@ app.put("/updateMatchday", function (req, res) {
   });
 });
 
+app.delete("/deleteMatchday", function (req, res) {
+  let matchdayId = req.body.matchdayId;
+  const deleteString = "DELETE FROM Matchdays WHERE matchdayId=?";
+  mysql.pool.query(deleteString, [matchdayId], function (err, results) {
+    if (err) {
+      res.send(err);
+      next(err);
+      return;
+    }
+    res.send("success");
+  });
+});
+
 app.get("/results", function (req, res, next) {
   var context = {};
   context.title = "Results";

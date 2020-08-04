@@ -100,5 +100,32 @@ function updateMatchday(ev) {
     });
 }
 
+function deleteMatchday(ev) {
+  if (
+    !confirm(
+      "Are you sure you would like to delete this matchday? Any associated results will also be deleted."
+    )
+  ) {
+    return;
+  }
+  let matchday = ev.target.parentNode.parentNode;
+  let matchdayId = matchday.querySelector("input[name='matchdayId']").value;
+  $.ajax({
+    type: "DELETE",
+    url: "deleteMatchday",
+    contentType: "application/json",
+    data: JSON.stringify({ matchdayId: matchdayId }),
+  })
+    .done(function () {
+      window.location.reload();
+    })
+    .fail(function () {
+      alert("Delete failed! Try again.");
+    });
+}
+
 let edits = document.querySelectorAll("button[name='editMatchday']");
 edits.forEach((edit) => edit.addEventListener("click", editMatchday));
+
+let deletes = document.querySelectorAll("button[name='deleteMatchday']");
+deletes.forEach((del) => del.addEventListener("click", deleteMatchday));
