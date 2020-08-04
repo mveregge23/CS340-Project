@@ -12,27 +12,30 @@
 </div>
 <h3>Current Matchdays</h3>
 <div>
-  <label for="team1">Team1: </label>
-  <select id="team1">
-    <option value="team1">team 1</option>
-    <option value="team2">team 2</option>
-    <option value="team3">team 3</option>
-    <option value="team4">team 4</option>
-  </select>
+  <form id="/newMatchday" action="newMatchday" method="POST" onsubmit="return validateNewMatchday(this)">
+    <label for="team1">Team 1: </label>
+    <select id="team1" name="team1">
+      <option value="">Select a Team</option>
+      {{#each teams}}
+      <option value="{{this.teamId}}">{{this.teamName}}</option>
+      {{/each}}
+    </select>
 
-  <label for="team2">Team 2: </label>
+    <label for="team2">Team 2: </label>
+    <select id="team2" name="team2">
+      <option value="">Select a Team</option>
+      {{#each teams}}
+      <option value="{{this.teamId}}">{{this.teamName}}</option>
+      {{/each}}
+    </select>
 
-  <select id="team2">
-    <option value="team1">team 1</option>
-    <option value="team2">team 2</option>
-    <option value="team3">team 3</option>
-    <option value="team4">team 4</option>
-  </select>
-  <form action="">
-    <label for="matchDate">Match Date:</label>
-    <input type="date" id="matchDate" name="matchDate" />
-    <input type="submit" value="Add Matchday" />
+    <label for="gameDate">Match Date:</label>
+    <input type="datetime-local" id="gameDate" name="gameDate" />
+    <input type="submit" id="submitNewMatchday" value="Add Matchday" />
+    <span name="message"></span>
   </form>
+
+
 </div>
 <h3>Current Schedule</h3>
 <table>
@@ -41,25 +44,27 @@
     <th>Home</th>
     <th>Away</th>
   </tr>
+  {{#each matchdays}}
   <tr>
-    <td>08/19/20</td>
-    <td>Manchester United</td>
+    <td><input type="datetime-local" value="{{this.gameDate}}" name="gameDate" disabled></td>
+    <td><select name="team1" disabled>
+        <option value="">Select a Team</option>
+        {{#each @root.teams}}
+        <option value="{{this.teamId}}" {{selected this.teamId ../this.teamId1}}>{{this.teamName}}</option>
+        {{/each}}
+      </select></td>
     <td>vs</td>
-    <td>Leicester City</td>
-    <td><button>Remove</button></td>
+    <td><select name="team2" disabled>
+        <option value="">Select a Team</option>
+        {{#each @root.teams}}
+        <option value="{{this.teamId}}" {{selected this.teamId ../this.teamId1}}>{{this.teamName}}</option>
+        {{/each}}
+      </select></td>
+    <input type="hidden" name="matchdayId" value="{{this.matchdayId}}" disabled>
+    <td><button name="deleteMatchday">Remove</button></td>
+    <td><button name="editMatchday">Edit</button></td>
+    <td> <span name="message"></span>
+    </td>
   </tr>
-  <tr>
-    <td>08/22/20</td>
-    <td>Liverpool</td>
-    <td>vs</td>
-    <td>Manchester United</td>
-    <td><button>Remove</button></td>
-  </tr>
-  <tr>
-    <td>08/26/20</td>
-    <td>Liverpool</td>
-    <td>vs</td>
-    <td>Manchester United</td>
-    <td><button>Remove</button></td>
-  </tr>
+  {{/each}}
 </table>
