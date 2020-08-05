@@ -83,7 +83,7 @@ function updateMatchday(ev) {
   }
   $.ajax({
     type: "PUT",
-    url: "updateMatchday",
+    url: "matchdays",
     contentType: "application/json",
     data: JSON.stringify(body),
   })
@@ -112,7 +112,7 @@ function deleteMatchday(ev) {
   let matchdayId = matchday.querySelector("input[name='matchdayId']").value;
   $.ajax({
     type: "DELETE",
-    url: "deleteMatchday",
+    url: "matchdays",
     contentType: "application/json",
     data: JSON.stringify({ matchdayId: matchdayId }),
   })

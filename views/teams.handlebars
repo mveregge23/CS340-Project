@@ -11,11 +11,16 @@
 </div>
 <div>
   <h3>Teams</h3>
-  <form action="/action_page.php">
+  <form action="/teams" method="POST">
     <label for="fname">Team Name: </label>
-    <input type="text" id="fname" name="team" />
+    <input type="text" name="team" maxlength="255" />
     <label for="lname">Roster: </label>
-    <input type="text" id="lname" name="roster" />
+    <select name="roster">
+      <option value="">Select a Roster</option>
+      {{#each rosters}}
+      <option value="{{this.rosterId}}">{{this.name}}</option>
+      {{/each}}
+    </select>
     <input type="submit" value="Add Team" />
   </form>
 </div>
@@ -23,13 +28,12 @@
 <table>
   <tr>
     <th>Team Name</th>
+    <th>Roster Name</th>
   </tr>
-  <td>Liverpool</td>
-  <td><button>Remove</button></td>
+  {{#each teams}}
   <tr>
-    <td>Manchester United</td>
-    <td><button>Remove</button></td>
+    <td name="team">{{this.teamName}}</td>
+    <td name="roster">{{this.rosterName}}</td>
   </tr>
-  <td>Leicester City</td>
-  <td><button>Remove</button></td>
+  {{/each}}
 </table>

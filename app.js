@@ -26,11 +26,16 @@ app.get("/index", function (req, res, next) {
 });
 
 app.get("/players", function (req, res, next) {
-  var context = {};
+  let context = {};
   context.title = "Players";
   mysql.pool.query("SELECT * FROM Players", function (err, result) {
     if (err) {
-      next(err);
+      context.error = {
+        code: err.code,
+        sql: err.sql,
+        "sql-err": err.sqlMessage,
+      };
+      res.render("500", context);
       return;
     }
     console.log(result);
@@ -40,119 +45,207 @@ app.get("/players", function (req, res, next) {
 });
 
 app.get("/matchdays", function (req, res, next) {
-  var context = { scripts: ["matchdays.js"], title: "Matchdays" };
+  var context = {
+    scripts: ["matchdays.js"],
+    title: "Matchdays",
+  };
   mysql.pool.query(
-    "SELECT Matchdays.matchdayId, Matchdays.gameDate, Teams1.teamName AS teamName1,\
-    Teams1.teamId AS teamId1, Teams2.teamName AS teamName2, Teams2.teamId AS teamId2\
-    FROM Matchdays JOIN Teams AS Teams1 ON Matchdays.teamId1 = Teams1.teamId JOIN Teams AS Teams2 ON Matchdays.teamId2 = Teams2.teamId",
+    "SELECT teamName, teamId from Teams;\
+    SELECT Matchdays.matchdayId, Matchdays.gameDate, t1.teamName, t2.teamName, t1.teamId AS teamId1, t2.teamId AS teamId2 FROM Matchdays\
+    JOIN Teams_Matchdays AS tm1 ON Matchdays.matchdayId=tm1.matchday\
+    JOIN Teams as t1 ON tm1.team=t1.teamId\
+    JOIN Teams_Matchdays as tm2 ON Matchdays.matchdayId=tm2.matchday AND tm1.teamMatchdayId!=tm2.teamMatchdayId\
+    JOIN Teams as t2 ON tm2.team=t2.teamId\
+    GROUP BY Matchdays.matchdayId;",
     function (err, result) {
       if (err) {
-        next(err);
+        context.error = {
+          code: err.code,
+          sql: err.sql,
+          "sql-err": err.sqlMessage,
+        };
+        res.render("500", context);
+        return;
       }
-      context.matchdays = result;
-      context.matchdays.map((m) => {
-        m.gameDate = moment(m.gameDate).format("yyyy-MM-DDTHH:mm");
-        return m;
+      console.log(result);
+      context.teams = result[0];
+      context.matchdays = result[1];
+      context.matchdays.forEach((md) => {
+        md.gameDate = moment(md.gameDate).format("yyyy-MM-DDTHH:mm");
+        return md;
       });
-      mysql.pool.query("SELECT teamName, teamId FROM Teams", function (
-        err,
-        result
-      ) {
-        if (err) {
-          next(err);
-        }
-        context.teams = result;
-        res.render("matchdays", context);
-      });
+      res.render("matchdays", context);
     }
   );
 });
 
-app.post("/newMatchday", function (req, res) {
-  let values = [];
-  for (let val in req.body) {
-    values.push(req.body[val]);
-  }
-  const insertString =
-    "INSERT INTO Matchdays (teamId1, teamId2, gameDate) VALUES (?, ?, ?)";
-  mysql.pool.query(insertString, values, function (err, results) {
+app.post("/matchdays", function (req, res) {
+  let team1 = req.body["team1"];
+  let team2 = req.body["team2"];
+  let gameDate = req.body["gameDate"];
+  const matchdaysInsert = "INSERT INTO Matchdays (gameDate) VALUES (?)";
+  mysql.pool.query(matchdaysInsert, [gameDate], function (err, results) {
+    let context = {};
     if (err) {
-      res.send(err);
-      next(err);
+      context.error = {
+        code: err.code,
+        sql: err.sql,
+        "sql-err": err.sqlMessage,
+      };
+      res.render("500", context);
       return;
     }
-    res.redirect("matchdays");
+    let matchdayId = results.insertId;
+    const teamsMatchdaysInsert =
+      "INSERT INTO Teams_Matchdays (team, matchday) VALUES (?, ?); INSERT INTO Teams_Matchdays (team, matchday) VALUES (?, ?);";
+    mysql.pool.query(
+      teamsMatchdaysInsert,
+      [team1, matchdayId, team2, matchdayId],
+      function (err, results) {
+        if (err) {
+          context.error = {
+            code: err.code,
+            sql: err.sql,
+            "sql-err": err.sqlMessage,
+          };
+          res.render("500", context);
+          return;
+        }
+        res.redirect("matchdays");
+      }
+    );
   });
 });
 
-app.put("/updateMatchday", function (req, res) {
+app.put("/matchdays", function (req, res) {
   let values = [];
   for (let val in req.body) {
-    values.push(req.body[val]);
+    values.push(req.body[val] === "" ? null : req.body[val]);
   }
   const updateString =
     "UPDATE Matchdays SET gameDate=?, teamId1=?, teamId2=? WHERE matchdayId=?";
   mysql.pool.query(updateString, values, function (err, results) {
+    let context = {};
     if (err) {
-      res.send(err);
+      context.error = {
+        code: err.code,
+        sql: err.sql,
+        "sql-err": err.sqlMessage,
+      };
+      res.render("500", context);
+      return;
     }
     res.send("success");
     return;
   });
 });
 
-app.delete("/deleteMatchday", function (req, res) {
+app.delete("/matchdays", function (req, res) {
   let matchdayId = req.body.matchdayId;
   const deleteString = "DELETE FROM Matchdays WHERE matchdayId=?";
   mysql.pool.query(deleteString, [matchdayId], function (err, results) {
     if (err) {
-      res.send(err);
-      next(err);
+      let context = {};
+      context.error = {
+        code: err.code,
+        sql: err.sql,
+        "sql-err": err.sqlMessage,
+      };
+      res.render("500", context);
       return;
     }
     res.send("success");
   });
 });
 
-app.get("/results", function (req, res, next) {
-  var context = {};
+app.get("/results", function (req, res) {
+  let context = {};
   context.title = "Results";
-  mysql.pool.query("SELECT * FROM Results", function (err, result) {
-    if (err) {
-      next(err);
-      return;
+  mysql.pool.query(
+    "SELECT matchdayId, gameDate, Teams1.teamName AS team1Name, Teams2.teamName AS team2Name\
+     FROM Matchdays JOIN Teams as Teams1 on Matchdays.teamId1 = Teams1.teamId\
+     JOIN Teams AS Teams2 ON Matchdays.teamId2 = Teams2.teamId WHERE Matchdays.result IS NULL;",
+    function (err, result) {
+      if (err) {
+        context.error = {
+          code: err.code,
+          sql: err.sql,
+          "sql-err": err.sqlMessage,
+        };
+        res.render("500", context);
+        return;
+      }
+      result.map((m) => {
+        m.gameDate = moment(m.gameDate).format("yyyy-MM-DDTHH:mm");
+        return m;
+      });
+      context.matchdays = result;
+      res.render("results", context);
     }
-    console.log(result);
-    context.results = result;
-    res.render("results", context);
-  });
+  );
 });
 
-app.get("/rosters", function (req, res, next) {
+app.get("/rosters", function (req, res) {
   var context = {};
   context.title = "Rosters";
   mysql.pool.query("SELECT * FROM Rosters", function (err, result) {
     if (err) {
-      next(err);
+      context.error = {
+        code: err.code,
+        sql: err.sql,
+        "sql-err": err.sqlMessage,
+      };
+      res.render("500", context);
       return;
     }
-    console.log(result);
     context.results = result;
     res.render("rosters", context);
   });
 });
 
 app.get("/teams", function (req, res, next) {
-  var context = {};
+  let context = {};
   context.title = "Teams";
-  mysql.pool.query("SELECT * FROM Teams", function (err, result) {
+  mysql.pool.query(
+    "SELECT * FROM Teams JOIN Rosters ON Teams.roster=Rosters.rosterId;\
+    SELECT rosterId, rosterName FROM Rosters WHERE rosterId NOT IN\
+    (SELECT DISTINCT roster FROM Teams)",
+    function (err, result) {
+      if (err) {
+        context.error = {
+          code: err.code,
+          sql: err.sql,
+          "sql-err": err.sqlMessage,
+        };
+        res.render("500", context);
+        return;
+      }
+      context.teams = result[0];
+      context.rosters = result[1];
+      console.log(context);
+      res.render("teams", context);
+    }
+  );
+});
+
+app.post("/teams", function (req, res) {
+  let newTeam = [];
+  for (let val in req.body) {
+    newTeam.push(req.body[val] === "" ? null : req.body[val]);
+  }
+  const insertString = "INSERT INTO Teams (teamName, roster) VALUES (?, ?)";
+  mysql.pool.query(insertString, newTeam, function (err, results) {
+    let context = {};
     if (err) {
-      next(err);
+      context.error = {
+        code: err.code,
+        sql: err.sql,
+        "sql-err": err.sqlMessage,
+      };
+      res.render("500", context);
       return;
     }
-    console.log(result);
-    context.results = result;
-    res.render("teams", context);
+    res.render("teams");
   });
 });
 
@@ -238,15 +331,6 @@ app.get("/reset-table", function (req, res, next) {
   });
 });
 
-function next(err) {
-  app.use(function (req, res) {
-    res.status(500);
-    context = {};
-    context.error = { code: err.code, sql: err.sql, "sql-err": err.sqlMessage };
-    res.render("500", context);
-  });
-}
-
 app.use(function (req, res) {
   res.status(404);
   res.render("404");
@@ -262,7 +346,7 @@ app.listen(app.get("port"), function () {
   console.log(
     "Express started on http://localhost:" +
       app.get("port") +
-      "; press Ctrl-C to terminate."
+      " press Ctrl-C to terminate."
   );
 });
 
