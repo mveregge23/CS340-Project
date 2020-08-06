@@ -67,7 +67,6 @@ app.get("/matchdays", function (req, res, next) {
         res.render("500", context);
         return;
       }
-      console.log(result);
       context.teams = result[0];
       context.matchdays = result[1];
       context.matchdays.forEach((md) => {
@@ -118,32 +117,42 @@ app.post("/matchdays", function (req, res) {
 });
 
 app.put("/matchdays", function (req, res) {
-  let values = [];
-  for (let val in req.body) {
-    values.push(req.body[val] === "" ? null : req.body[val]);
-  }
-  const updateString =
-    "UPDATE Matchdays SET gameDate=?, teamId1=?, teamId2=? WHERE matchdayId=?";
-  mysql.pool.query(updateString, values, function (err, results) {
-    let context = {};
-    if (err) {
-      context.error = {
-        code: err.code,
-        sql: err.sql,
-        "sql-err": err.sqlMessage,
-      };
-      res.render("500", context);
-      return;
+  let teamId1 = req.body.team1,
+    teamId2 = req.body.team2,
+    matchdayId = req.body.matchdayId,
+    context = {};
+  const insertString =
+    "INSERT INTO Teams_Matchdays (matchday, team) VALUES (?, ?), (?, ?);";
+  mysql.pool.query(
+    insertString,
+    [matchdayId, teamId1, matchdayId, teamId2],
+    function (err, results) {
+      if (err) {
+        context.error = {
+          code: err.code,
+          sql: err.sql,
+          "sql-err": err.sqlMessage,
+        };
+        res.render(500, context);
+        return;
+      }
+
+      res.send("success");
     }
-    res.send("success");
-    return;
-  });
+  );
 });
 
 app.delete("/matchdays", function (req, res) {
   let matchdayId = req.body.matchdayId;
-  const deleteString = "DELETE FROM Matchdays WHERE matchdayId=?";
-  mysql.pool.query(deleteString, [matchdayId], function (err, results) {
+  let team1 = req.body.team1;
+  let team2 = req.body.team2;
+  console.log("MatchdayId %s, team1 %s, team2 %s", matchdayId, team1, team2);
+  const deleteString =
+    "DELETE FROM Teams_Matchdays WHERE matchday=? AND (team=? OR team=?)";
+  mysql.pool.query(deleteString, [matchdayId, team1, team2], function (
+    err,
+    results
+  ) {
     if (err) {
       let context = {};
       context.error = {
@@ -161,10 +170,17 @@ app.delete("/matchdays", function (req, res) {
 app.get("/results", function (req, res) {
   let context = {};
   context.title = "Results";
+  context.scripts = ["results.js"];
   mysql.pool.query(
-    "SELECT matchdayId, gameDate, Teams1.teamName AS team1Name, Teams2.teamName AS team2Name\
-     FROM Matchdays JOIN Teams as Teams1 on Matchdays.teamId1 = Teams1.teamId\
-     JOIN Teams AS Teams2 ON Matchdays.teamId2 = Teams2.teamId WHERE Matchdays.result IS NULL;",
+    "SELECT Teams.teamName, SUM(Teams_Matchdays.goals) AS goals, SUM(Teams_Matchdays.points) AS points\
+     FROM Teams_Matchdays JOIN Teams ON Teams_Matchdays.team=Teams.teamId GROUP BY Teams.teamName;\
+     SELECT Matchdays.gameDate, Matchdays.matchdayId, t1.teamName AS teamName1, tm1.teamMatchdayId as tmId1, t2.teamName as teamName2, tm2.teamMatchdayId as tmId2\
+     FROM Matchdays JOIN Teams_Matchdays AS tm1 ON Matchdays.matchdayId=tm1.matchday\
+     JOIN Teams AS t1 ON tm1.team=t1.teamId\
+     JOIN Teams_Matchdays AS tm2 ON Matchdays.matchdayId=tm2.matchday AND tm2.team!=tm1.team\
+     JOIN Teams as t2 ON tm2.team=t2.teamId\
+     WHERE tm1.goals IS NULL AND tm2.goals IS NULL\
+     GROUP BY Matchdays.matchdayId; ",
     function (err, result) {
       if (err) {
         context.error = {
@@ -175,11 +191,13 @@ app.get("/results", function (req, res) {
         res.render("500", context);
         return;
       }
-      result.map((m) => {
+      console.log(result);
+      context.results = result[0];
+      context.matchdays = result[1];
+      context.matchdays.forEach((m) => {
         m.gameDate = moment(m.gameDate).format("yyyy-MM-DDTHH:mm");
         return m;
       });
-      context.matchdays = result;
       res.render("results", context);
     }
   );

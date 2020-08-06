@@ -52,7 +52,8 @@
         {{#each @root.teams}}
         <option value="{{this.teamId}}" {{selected this.teamId ../this.teamId1}}>{{this.teamName}}</option>
         {{/each}}
-      </select></td>
+      </select>
+    </td>
     <td>vs</td>
     <td><select name="team2" disabled>
         <option value="">Select a Team</option>
@@ -61,8 +62,7 @@
         {{/each}}
       </select></td>
     <input type="hidden" name="matchdayId" value="{{this.matchdayId}}" disabled>
-    <td><button name="deleteMatchday">Remove</button></td>
-    <td><button name="editMatchday">Edit</button></td>
+    <td><button name="changeTeams">Change Teams</button></td>
     <td> <span name="message"></span>
     </td>
   </tr>

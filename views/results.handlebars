@@ -23,7 +23,8 @@
     <label for="matchday">Matchday </label>
     <select name="matchday">
       {{#each matchdays}}
-      <option value="{{this.matchdayId}}">{{this.gameDate}} {{this.team1Name}} vs. {{this.team2Name}}</option>
+      <option value="{{this.matchdayId}}" tmId1="{{this.tmId1}}" tmId2="{{this.tmId2}}">{{this.gameDate}}
+        {{this.teamName1}} vs. {{this.teamName2}}</option>
       {{/each}}
     </select>
     <label for="team1Score">Team 1 Score: </label>
@@ -41,17 +42,13 @@
         <th>Goals Scored</th>
         <th>Current Points</th>
       </tr>
-      <td>Liverpool</td>
-      <td>49</td>
-      <td>32</td>
+      {{#each results}}
       <tr>
-        <td>Manchester United</td>
-        <td>16</td>
-        <td>42</td>
+        <td>{{this.teamName}}</td>
+        <td>{{this.goals}}</td>
+        <td>{{this.points}}</td>
       </tr>
-      <td>Leicester City</td>
-      <td>12</td>
-      <td>36</td>
+      {{/each}}
     </table>
   </div>
 </body>
