@@ -203,6 +203,50 @@ app.get("/results", function (req, res) {
   );
 });
 
+app.post("/results", function (req, res) {
+  const tmId1 = req.body.tmId1,
+    tmId2 = req.body.tmId2,
+    team1Goals = req.body.team1Score,
+    team2Goals = req.body.team2Score;
+  let team1Points, team2Points;
+  if (team1Goals > team2Goals) {
+    team1Points = 3;
+    team2Points = 0;
+  } else if (team2Goals > team1Goals) {
+    team2Points = 3;
+    team1Points = 0;
+  } else {
+    team1Points = 1;
+    team2Points = 1;
+  }
+  const values = [
+    team1Goals,
+    team1Points,
+    tmId1,
+    team2Goals,
+    team2Points,
+    tmId2,
+  ];
+  mysql.pool.query(
+    "UPDATE Teams_Matchdays SET goals=?, points=? WHERE teamMatchdayId=?;\
+   UPDATE Teams_Matchdays SET goals=?, points=? WHERE teamMatchdayId=?;",
+    values,
+    function (err, results) {
+      if (err) {
+        let context = {};
+        context.error = {
+          code: err.code,
+          sql: err.sql,
+          "sql-err": err.sqlMessage,
+        };
+        res.render("500", context);
+        return;
+      }
+      res.redirect("results");
+    }
+  );
+});
+
 app.get("/rosters", function (req, res) {
   var context = {};
   context.title = "Rosters";

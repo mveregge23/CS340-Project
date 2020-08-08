@@ -19,19 +19,23 @@
   </div>
 
   <h3>Add Result</h3>
-  <form action="/result" method="POST">
+  <form action="/results" method="POST" onsubmit="return validateNewResults(this)">
     <label for="matchday">Matchday </label>
-    <select name="matchday">
+    <select name="matchday" id="matchday">
+      <option value="">Select a Matchday</option>
       {{#each matchdays}}
       <option value="{{this.matchdayId}}" tmId1="{{this.tmId1}}" tmId2="{{this.tmId2}}">{{this.gameDate}}
         {{this.teamName1}} vs. {{this.teamName2}}</option>
       {{/each}}
     </select>
     <label for="team1Score">Team 1 Score: </label>
-    <input type="number" name="team1Score" />
+    <input type="hidden" name="tmId1" id="tmId1" value="" />
+    <input type="number" name="team1Score" min="0" />
     <label for="team2Score">Team 2 Score: </label>
-    <input type="number" name="team2Score" />
+    <input type="hidden" name="tmId2" id="tmId2" value="" />
+    <input type="number" name="team2Score" min="0" />
     <input type="submit" value="Add Result" />
+    <span name="message"></span>
   </form>
 
   <h3>Current Results</h3>

@@ -37,19 +37,14 @@ function validateExistingMatchday(matchday) {
 
   const teamId1 = matchday.querySelector("select[name='team1']").value;
   const teamId2 = matchday.querySelector("select[name='team2']").value;
-  const gameDate = matchday.querySelector("input[name='gameDate']").value;
 
   const sameTeams = teamId1 === teamId2 && teamId1 !== "";
   const blankTeam = teamId1 === "" || teamId2 === "";
-  const dateBeforeToday = new Date(gameDate) < new Date();
 
   if (sameTeams) {
     message = "Pick different teams!";
   } else if (blankTeam) {
     message = "Pick two teams!";
-  } else if (dateBeforeToday) {
-    message = "Pick a date after today!";
-  }
 
   let messageBox = matchday.querySelector("span[name='message']");
 
