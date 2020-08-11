@@ -54,7 +54,6 @@ app.get("/players", function (req, res, next) {
       res.render("500", context);
       return;
     }
-    console.log(result);
     context.results = result;
     res.render("players", context);
   });
@@ -162,7 +161,6 @@ app.delete("/matchdays", function (req, res) {
   let matchdayId = req.body.matchdayId;
   let team1 = req.body.team1;
   let team2 = req.body.team2;
-  console.log("MatchdayId %s, team1 %s, team2 %s", matchdayId, team1, team2);
   const deleteString =
     "DELETE FROM Teams_Matchdays WHERE matchday=? AND (team=? OR team=?)";
   mysql.pool.query(deleteString, [matchdayId, team1, team2], function (
@@ -312,7 +310,6 @@ app.get("/teams", function (req, res, next) {
       }
       context.teams = result[0];
       context.rosters = result[1];
-      console.log(context);
       res.render("teams", context);
     }
   );
@@ -336,88 +333,6 @@ app.post("/teams", function (req, res) {
       return;
     }
     res.render("teams");
-  });
-});
-
-app.get("/delete", function (req, res, next) {
-  var context = {};
-  mysql.pool.query("DELETE FROM todo WHERE id=?", [req.query.id], function (
-    err,
-    result
-  ) {
-    if (err) {
-      next(err);
-      return;
-    }
-    context.results = "Deleted " + result.changedRows + " rows.";
-    res.render("home", context);
-  });
-});
-
-///simple-update?id=2&name=The+Task&done=false&due=2015-12-5
-app.get("/simple-update", function (req, res, next) {
-  var context = {};
-  mysql.pool.query(
-    "UPDATE todo SET name=?, done=?, due=? WHERE id=? ",
-    [req.query.name, req.query.done, req.query.due, req.query.id],
-    function (err, result) {
-      if (err) {
-        next(err);
-        return;
-      }
-      context.results = "Updated " + result.changedRows + " rows.";
-      res.render("home", context);
-    }
-  );
-});
-
-///safe-update?id=1&name=The+Task&done=false
-app.get("/safe-update", function (req, res, next) {
-  var context = {};
-  mysql.pool.query("SELECT * FROM todo WHERE id=?", [req.query.id], function (
-    err,
-    result
-  ) {
-    if (err) {
-      next(err);
-      return;
-    }
-    if (result.length == 1) {
-      var curVals = result[0];
-      mysql.pool.query(
-        "UPDATE todo SET name=?, done=?, due=? WHERE id=? ",
-        [
-          req.query.name || curVals.name,
-          req.query.done || curVals.done,
-          req.query.due || curVals.due,
-          req.query.id,
-        ],
-        function (err, result) {
-          if (err) {
-            next(err);
-            return;
-          }
-          context.results = "Updated " + result.changedRows + " rows.";
-          res.render("home", context);
-        }
-      );
-    }
-  });
-});
-
-app.get("/reset-table", function (req, res, next) {
-  var context = {};
-  mysql.pool.query("DROP TABLE IF EXISTS todo", function (err) {
-    var createString =
-      "CREATE TABLE todo(" +
-      "id INT PRIMARY KEY AUTO_INCREMENT," +
-      "name VARCHAR(255) NOT NULL," +
-      "done BOOLEAN," +
-      "due DATE)";
-    mysql.pool.query(createString, function (err) {
-      context.results = "Table reset";
-      res.render("home", context);
-    });
   });
 });
 
