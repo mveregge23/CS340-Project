@@ -1,60 +1,51 @@
-<!DOCTYPE html>
-<html>
+<h1>Results</h1>
+<div>
+  <p>
+    This is where results information can be added to a matchday between two teams, and past results
+    are displayed. After adding a matchday associated with two teams, the user can come to this page
+    to add the results of that matchday. The user provides the number of goals scored by each team,
+    and the points earned are calculated by the server before updating the relationship table with the
+    goals and points for each team. The information entered on this page is used to display the league
+    table on the Home page.
+  </p>
+</div>
 
-<head>
-  <title>Home Page</title>
-</head>
+<h3>Add Result</h3>
+<form action="/results" method="POST" onsubmit="return validateNewResults(this)">
+  <label for="matchday">Matchday </label>
+  <select name="matchday" id="matchday">
+    <option value="">Select a Matchday</option>
+    {{#each matchdays}}
+    <option value="{{this.matchdayId}}" tmId1="{{this.tmId1}}" tmId2="{{this.tmId2}}">{{this.gameDate}}
+      {{this.teamName1}} vs. {{this.teamName2}}</option>
+    {{/each}}
+  </select>
+  <label for="team1Score">Team 1 Score: </label>
+  <input type="hidden" name="tmId1" id="tmId1" value="" />
+  <input type="number" name="team1Score" min="0" />
+  <label for="team2Score">Team 2 Score: </label>
+  <input type="hidden" name="tmId2" id="tmId2" value="" />
+  <input type="number" name="team2Score" min="0" />
+  <input type="submit" value="Add Result" />
+  <span name="message"></span>
+</form>
 
-<body>
-  <h1>Results</h1>
-  <div>
-    <h2>Overview</h2>
-    <p>
-      This is where result information will be populated. This page will
-      include a client side interaction to enter team 1 and team 2 results, as
-      well as the over all winner (autopopulated based on score). This
-      information will be used on the league table to calculate the current
-      points each team has.
-    </p>
-  </div>
-
-  <h3>Add Result</h3>
-  <form action="/results" method="POST" onsubmit="return validateNewResults(this)">
-    <label for="matchday">Matchday </label>
-    <select name="matchday" id="matchday">
-      <option value="">Select a Matchday</option>
-      {{#each matchdays}}
-      <option value="{{this.matchdayId}}" tmId1="{{this.tmId1}}" tmId2="{{this.tmId2}}">{{this.gameDate}}
-        {{this.teamName1}} vs. {{this.teamName2}}</option>
-      {{/each}}
-    </select>
-    <label for="team1Score">Team 1 Score: </label>
-    <input type="hidden" name="tmId1" id="tmId1" value="" />
-    <input type="number" name="team1Score" min="0" />
-    <label for="team2Score">Team 2 Score: </label>
-    <input type="hidden" name="tmId2" id="tmId2" value="" />
-    <input type="number" name="team2Score" min="0" />
-    <input type="submit" value="Add Result" />
-    <span name="message"></span>
-  </form>
-
-  <h3>Current Results</h3>
-  <div>
-    <table>
-      <tr>
-        <th>Team Name</th>
-        <th>Goals Scored</th>
-        <th>Current Points</th>
-      </tr>
-      {{#each results}}
-      <tr>
-        <td>{{this.teamName}}</td>
-        <td>{{this.goals}}</td>
-        <td>{{this.points}}</td>
-      </tr>
-      {{/each}}
-    </table>
-  </div>
-</body>
-
-</html>
+<h3>Results</h3>
+<table>
+  <tr>
+    <th>Match Date</th>
+    <th>Team 1</th>
+    <th>Team 1 Goals</th>
+    <th>Team 2</th>
+    <th>Team 2 Goals</th>
+  </tr>
+  {{#each results}}
+  <tr>
+    <td>{{this.gameDate}}</td>
+    <td>{{this.teamName1}}</td>
+    <td>{{this.tmGoals1}}</td>
+    <td>{{this.teamName2}}</td>
+    <td>{{this.tmGoals2}}</td>
+  </tr>
+  {{/each}}
+</table>

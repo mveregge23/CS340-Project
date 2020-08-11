@@ -22,7 +22,23 @@ app.use(express.static("public"));
 app.get("/index", function (req, res, next) {
   var context = {};
   context.title = "Home";
-  res.render("index", context);
+  mysql.pool.query(
+    "SELECT Teams.teamName, SUM(COALESCE(Teams_Matchdays.goals,0)) AS goals, SUM(COALESCE(Teams_Matchdays.points,0)) AS points\
+     FROM Teams_Matchdays JOIN Teams ON Teams_Matchdays.team=Teams.teamId GROUP BY Teams.teamName ORDER BY points DESC, goals DESC;",
+    function (err, results) {
+      if (err) {
+        context.error = {
+          code: err.code,
+          sql: err.sql,
+          "sql-err": err.sqlMessage,
+        };
+        res.render("500", context);
+        return;
+      }
+      context.results = results;
+      res.render("index", context);
+    }
+  );
 });
 
 app.get("/players", function (req, res, next) {
@@ -172,16 +188,24 @@ app.get("/results", function (req, res) {
   context.title = "Results";
   context.scripts = ["results.js"];
   mysql.pool.query(
-    "SELECT Teams.teamName, SUM(Teams_Matchdays.goals) AS goals, SUM(Teams_Matchdays.points) AS points\
-     FROM Teams_Matchdays JOIN Teams ON Teams_Matchdays.team=Teams.teamId GROUP BY Teams.teamName;\
-     SELECT Matchdays.gameDate, Matchdays.matchdayId, t1.teamName AS teamName1, tm1.teamMatchdayId as tmId1, t2.teamName as teamName2, tm2.teamMatchdayId as tmId2\
+    "SELECT Matchdays.gameDate, Matchdays.matchdayId, t1.teamName AS teamName1,\
+     tm1.teamMatchdayId as tmId1, t2.teamName as teamName2, tm2.teamMatchdayId as tmId2\
      FROM Matchdays JOIN Teams_Matchdays AS tm1 ON Matchdays.matchdayId=tm1.matchday\
      JOIN Teams AS t1 ON tm1.team=t1.teamId\
      JOIN Teams_Matchdays AS tm2 ON Matchdays.matchdayId=tm2.matchday AND tm2.team!=tm1.team\
      JOIN Teams as t2 ON tm2.team=t2.teamId\
      WHERE tm1.goals IS NULL AND tm2.goals IS NULL\
-     GROUP BY Matchdays.matchdayId; ",
-    function (err, result) {
+     GROUP BY Matchdays.matchdayId;\
+     SELECT Matchdays.gameDate, t1.teamName AS teamName1,\
+     tm1.goals as tmGoals1, t2.teamName as teamName2, tm2.goals as tmGoals2\
+     FROM Matchdays JOIN Teams_Matchdays AS tm1 ON Matchdays.matchdayId=tm1.matchday\
+     JOIN Teams AS t1 ON tm1.team=t1.teamId\
+     JOIN Teams_Matchdays AS tm2 ON Matchdays.matchdayId=tm2.matchday AND tm2.team!=tm1.team\
+     JOIN Teams as t2 ON tm2.team=t2.teamId\
+     WHERE tm1.goals IS NOT NULL AND tm2.goals IS NOT NULL\
+     GROUP BY Matchdays.matchdayId\
+     ORDER BY Matchdays.gameDate DESC;",
+    function (err, results) {
       if (err) {
         context.error = {
           code: err.code,
@@ -191,12 +215,15 @@ app.get("/results", function (req, res) {
         res.render("500", context);
         return;
       }
-      console.log(result);
-      context.results = result[0];
-      context.matchdays = result[1];
+      context.matchdays = results[0];
+      context.results = results[1];
       context.matchdays.forEach((m) => {
         m.gameDate = moment(m.gameDate).format("yyyy-MM-DDTHH:mm");
         return m;
+      });
+      context.results.forEach((r) => {
+        r.gameDate = moment(r.gameDate).format("yyyy-MM-DDTHH:mm");
+        return r;
       });
       res.render("results", context);
     }
@@ -268,6 +295,7 @@ app.get("/rosters", function (req, res) {
 app.get("/teams", function (req, res, next) {
   let context = {};
   context.title = "Teams";
+  context.scripts = ["teams.js"];
   mysql.pool.query(
     "SELECT * FROM Teams JOIN Rosters ON Teams.roster=Rosters.rosterId;\
     SELECT rosterId, rosterName FROM Rosters WHERE rosterId NOT IN\

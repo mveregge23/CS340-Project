@@ -1,1 +1,19 @@
 <h1>Home</h1>
+
+<h3>Current Standings</h3>
+<div>
+    <table>
+        <tr>
+            <th>Team Name</th>
+            <th>Goals Scored</th>
+            <th>Current Points</th>
+        </tr>
+        {{#each results}}
+        <tr>
+            <td>{{this.teamName}}</td>
+            <td>{{this.goals}}</td>
+            <td>{{this.points}}</td>
+        </tr>
+        {{/each}}
+    </table>
+</div>

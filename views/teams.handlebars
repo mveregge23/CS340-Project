@@ -1,20 +1,20 @@
-<h1>Teams Page</h1>
+<h1>Teams</h1>
 
 <div>
-  <h2>Overview</h2>
   <p>
-    This is where all team information will exist. On this page there will
-    be the ability to add teams line by line, as well as adding the
-    associated roster and viewing the current list of teams associated with
-    this league. Team names can be removed using the teams table.
+    This is where the user can add teams and associate them with a roster. Since a team
+    must be associated with a roster, and a roster can only be associated with one team,
+    their must be an existing roster that is not associated with a team in order to add
+    a new team. Once there are two or more teams, the user can add a new matchday on the
+    Matchdays page.
   </p>
 </div>
 <div>
   <h3>Teams</h3>
-  <form action="/teams" method="POST">
-    <label for="fname">Team Name: </label>
+  <form action="/teams" method="POST" onsubmit="return validateNewTeam(this)">
+    <label for="team">Team Name: </label>
     <input type="text" name="team" maxlength="255" />
-    <label for="lname">Roster: </label>
+    <label for="roster">Roster: </label>
     <select name="roster">
       <option value="">Select a Roster</option>
       {{#each rosters}}
@@ -22,6 +22,7 @@
       {{/each}}
     </select>
     <input type="submit" value="Add Team" />
+    <span name="message"></span>
   </form>
 </div>
 <h3>Current Teams</h3>

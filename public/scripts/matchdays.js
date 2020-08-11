@@ -46,15 +46,16 @@ function validateExistingMatchday(matchday) {
   } else if (blankTeam) {
     message = "Pick two teams!";
 
-  let messageBox = matchday.querySelector("span[name='message']");
+    let messageBox = matchday.querySelector("span[name='message']");
 
-  if (message) {
-    messageBox.style.color = "red";
-    messageBox.innerHTML = message;
-    return false;
-  } else {
-    messageBox.innerHTML = "";
-    return true;
+    if (message) {
+      messageBox.style.color = "red";
+      messageBox.innerHTML = message;
+      return false;
+    } else {
+      messageBox.innerHTML = "";
+      return true;
+    }
   }
 }
 
@@ -121,4 +122,6 @@ function updateTeams(ev) {
 }
 
 let changes = document.querySelectorAll("button[name='changeTeams']");
-changes.forEach((change) => change.addEventListener("click", changeTeams));
+changes.forEach((change) => {
+  change.addEventListener("click", changeTeams);
+});

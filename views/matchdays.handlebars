@@ -1,13 +1,15 @@
 <h1>Matchdays</h1>
 <div>
-  <h2>Overview</h2>
   <p>
     This is where matches are scheduled and the list of upcoming matches is
-    display. The goal of this page will be to have dynamically updated team
-    option lists based on the current teams that exist within the database.
-    these teams will be able to be scheduled against eachother, with a
-    calendar option also to set the match date.Matchdays can be removed
-    using the included buttons as well
+    displayed. A user can add new matchdays between two teams, or change the teams
+    associated with an existing matchday. When the user changes the teams associated with
+    an existing matchday, the relationship between the matchday and teams
+    is deleted along with any results (results exist as goals and points attributes
+    in the relationship table between teams and matchdays). After the user selects new
+    teams and associates them with the matchday, the relationship between the existing
+    matchday and new teams is added to the relationship table between teams and matchdays,
+    and the user can add the results of that matchday on the Results page.
   </p>
 </div>
 <h3>Current Matchdays</h3>
