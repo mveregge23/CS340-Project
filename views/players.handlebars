@@ -1,37 +1,32 @@
+
+<h2>Add New Player</h2>
+<form action="/players" method="POST">
+First Name: <input type = "text" name = "firstName">
+Last Name: <input type = "text" name = "lastName">
+Dues Paid? <select type= "number" name="duesPaid">
+                <option value="0">No</option>
+                <option value="1">Yes</option>
+        </select>
+Roster: <input type = "number" name = "roster"><br>
+<input type="submit" value="Add Player">
+</form>
 <div>
-  <h2>Add New Player</h2>
-</div>
-<div>
-  <input type="text" placeholder="First Name" />
-  <input type="text" placeholder="Last Name" />
-  <label><input type="checkbox" />Paid Dues?</label>
-  <button>Add Player</button>
-</div>
-<div>
-  <h2>Players</h2>
-</div>
-<div>
+  <h2>Current Players List</h2>
   <table>
-    <thead>
       <tr>
         <th>First Name</th>
         <th>Last Name</th>
         <th>Dues Paid?</th>
+        <th>Roster ID</th>
       </tr>
-    </thead>
-    <tbody>
+      
+      {{#each results}}
       <tr>
-        <td>Mike</td>
-        <td>Jones</td>
-        <td>Yes</td>
-        <td><button>Delete</button></td>
+      <td>{{this.firstName}}</td>
+      <td>{{this.lastName}}</td>
+      <td>{{this.duesPaid}}</td>
+      <td>{{this.roster}}</td>
       </tr>
-      <tr>
-        <td>Heung-min</td>
-        <td>Son</td>
-        <td>No</td>
-        <td><button>Delete</button></td>
-      </tr>
-    </tbody>
+        {{/each}}
   </table>
 </div>
