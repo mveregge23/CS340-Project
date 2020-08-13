@@ -41,6 +41,7 @@ app.get("/index", function (req, res, next) {
   );
 });
 
+/*--Get rows of players--*/
 app.get("/players", function (req, res, next) {
   let context = {};
   context.title = "Players";
@@ -56,6 +57,53 @@ app.get("/players", function (req, res, next) {
     }
     context.results = result;
     res.render("players", context);
+  });
+});
+
+/*--Insert new player to table--*/
+app.post("/players", function (req, res){
+  var sql = "INSERT INTO Players (firstName, lastName, duesPaid, roster) VALUES (?,?,?,?)";
+  var inserts = [req.body.firstName, req.body.lastName, req.body.duesPaid, req.body.roster];
+  mysql.pool.query(sql, inserts, function(error, results, field){
+    if(error){
+      res.write(JSON.stringify(error));
+      res.end();
+    }else{
+      res.redirect("/players");
+    }
+  });
+});
+
+/*--Get roster table information--*/
+app.get("/rosters", function (req, res) {
+  var context = {};
+  context.title = "Rosters";
+  mysql.pool.query("select Rosters.rosterId, Rosters.rosterName, Rosters.captain, Players.firstName, Players.lastName FROM Rosters JOIN Players on Rosters.captain= Players.playerId ORDER BY Rosters.rosterId", function (err, result) {
+    if (err) {
+      context.error = {
+        code: err.code,
+        sql: err.sql,
+        "sql-err": err.sqlMessage,
+      };
+      res.render("500", context);
+      return;
+    }
+    context.results = result;
+    res.render("rosters", context);
+  });
+});
+
+/*Insert new roster into Rosters Table */
+app.post("/rosters", function (req, res){
+  var sql = "INSERT INTO Rosters (rosterName, captain) VALUES (?,?)";
+  var inserts = [req.body.rosterName, req.body.captain];
+  mysql.pool.query(sql, inserts, function(error, results, field){
+    if(error){
+      res.write(JSON.stringify(error));
+      res.end();
+    }else{
+      res.redirect("/rosters");
+    }
   });
 });
 
@@ -272,23 +320,6 @@ app.post("/results", function (req, res) {
   );
 });
 
-app.get("/rosters", function (req, res) {
-  var context = {};
-  context.title = "Rosters";
-  mysql.pool.query("SELECT * FROM Rosters", function (err, result) {
-    if (err) {
-      context.error = {
-        code: err.code,
-        sql: err.sql,
-        "sql-err": err.sqlMessage,
-      };
-      res.render("500", context);
-      return;
-    }
-    context.results = result;
-    res.render("rosters", context);
-  });
-});
 
 app.get("/teams", function (req, res, next) {
   let context = {};
