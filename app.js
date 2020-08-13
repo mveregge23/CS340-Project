@@ -6,6 +6,7 @@ var app = express();
 var handlebars = require("express-handlebars").create({
   helpers: {
     selected: selected,
+    yesOrNo: yesOrNo,
   },
   defaultLayout: "main",
 });
@@ -45,30 +46,40 @@ app.get("/index", function (req, res, next) {
 app.get("/players", function (req, res, next) {
   let context = {};
   context.title = "Players";
-  mysql.pool.query("SELECT * FROM Players", function (err, result) {
-    if (err) {
-      context.error = {
-        code: err.code,
-        sql: err.sql,
-        "sql-err": err.sqlMessage,
-      };
-      res.render("500", context);
-      return;
+  mysql.pool.query(
+    "SELECT * FROM Players JOIN Rosters ON Players.roster = Rosters.rosterId; SELECT Rosters.rosterName, Rosters.rosterId FROM Rosters;",
+    function (err, results) {
+      if (err) {
+        context.error = {
+          code: err.code,
+          sql: err.sql,
+          "sql-err": err.sqlMessage,
+        };
+        res.render("500", context);
+        return;
+      }
+      context.players = results[0];
+      context.rosters = results[1];
+      res.render("players", context);
     }
-    context.results = result;
-    res.render("players", context);
-  });
+  );
 });
 
 /*--Insert new player to table--*/
-app.post("/players", function (req, res){
-  var sql = "INSERT INTO Players (firstName, lastName, duesPaid, roster) VALUES (?,?,?,?)";
-  var inserts = [req.body.firstName, req.body.lastName, req.body.duesPaid, req.body.roster];
-  mysql.pool.query(sql, inserts, function(error, results, field){
-    if(error){
+app.post("/players", function (req, res) {
+  var sql =
+    "INSERT INTO Players (firstName, lastName, duesPaid, roster) VALUES (?,?,?,?)";
+  var inserts = [
+    req.body.firstName,
+    req.body.lastName,
+    req.body.duesPaid,
+    req.body.roster,
+  ];
+  mysql.pool.query(sql, inserts, function (error, results, field) {
+    if (error) {
       res.write(JSON.stringify(error));
       res.end();
-    }else{
+    } else {
       res.redirect("/players");
     }
   });
@@ -78,30 +89,33 @@ app.post("/players", function (req, res){
 app.get("/rosters", function (req, res) {
   var context = {};
   context.title = "Rosters";
-  mysql.pool.query("select Rosters.rosterId, Rosters.rosterName, Rosters.captain, Players.firstName, Players.lastName FROM Rosters JOIN Players on Rosters.captain= Players.playerId ORDER BY Rosters.rosterId", function (err, result) {
-    if (err) {
-      context.error = {
-        code: err.code,
-        sql: err.sql,
-        "sql-err": err.sqlMessage,
-      };
-      res.render("500", context);
-      return;
+  mysql.pool.query(
+    "select Rosters.rosterId, Rosters.rosterName, Rosters.captain, Players.firstName, Players.lastName FROM Rosters JOIN Players on Rosters.captain= Players.playerId ORDER BY Rosters.rosterId",
+    function (err, result) {
+      if (err) {
+        context.error = {
+          code: err.code,
+          sql: err.sql,
+          "sql-err": err.sqlMessage,
+        };
+        res.render("500", context);
+        return;
+      }
+      context.results = result;
+      res.render("rosters", context);
     }
-    context.results = result;
-    res.render("rosters", context);
-  });
+  );
 });
 
 /*Insert new roster into Rosters Table */
-app.post("/rosters", function (req, res){
+app.post("/rosters", function (req, res) {
   var sql = "INSERT INTO Rosters (rosterName, captain) VALUES (?,?)";
   var inserts = [req.body.rosterName, req.body.captain];
-  mysql.pool.query(sql, inserts, function(error, results, field){
-    if(error){
+  mysql.pool.query(sql, inserts, function (error, results, field) {
+    if (error) {
       res.write(JSON.stringify(error));
       res.end();
-    }else{
+    } else {
       res.redirect("/rosters");
     }
   });
@@ -320,7 +334,6 @@ app.post("/results", function (req, res) {
   );
 });
 
-
 app.get("/teams", function (req, res, next) {
   let context = {};
   context.title = "Teams";
@@ -392,5 +405,13 @@ function selected(option, value) {
     return " selected";
   } else {
     return "";
+  }
+}
+
+function yesOrNo(value) {
+  if (value === 1) {
+    return "Yes";
+  } else if (value === 0) {
+    return "No";
   }
 }

@@ -1,32 +1,44 @@
-
 <h2>Add New Player</h2>
 <form action="/players" method="POST">
-First Name: <input type = "text" name = "firstName">
-Last Name: <input type = "text" name = "lastName">
-Dues Paid? <select type= "number" name="duesPaid">
-                <option value="0">No</option>
-                <option value="1">Yes</option>
-        </select>
-Roster: <input type = "number" name = "roster"><br>
-<input type="submit" value="Add Player">
+  First Name: <input type="text" name="firstName">
+  Last Name: <input type="text" name="lastName">
+  Dues Paid? <select type="number" name="duesPaid">
+    <option value="0">No</option>
+    <option value="1">Yes</option>
+  </select>
+  Roster: <select name="roster">
+    <option value="">Select a Roster</option>
+    {{#each rosters}}
+    <option value="{{this.rosterId}}">{{this.rosterName}}</option>
+    {{/each}}
+    </option>
+  </select><br>
+  <input type="submit" value="Add Player">
 </form>
 <div>
   <h2>Current Players List</h2>
   <table>
-      <tr>
-        <th>First Name</th>
-        <th>Last Name</th>
-        <th>Dues Paid?</th>
-        <th>Roster ID</th>
-      </tr>
-      
-      {{#each results}}
-      <tr>
+    <tr>
+      <th>First Name</th>
+      <th>Last Name</th>
+      <th>Dues Paid?</th>
+      <th>Roster Name</th>
+    </tr>
+    {{#each players}}
+    <tr>
       <td>{{this.firstName}}</td>
       <td>{{this.lastName}}</td>
-      <td>{{this.duesPaid}}</td>
-      <td>{{this.roster}}</td>
-      </tr>
-        {{/each}}
+      <td>{{yesOrNo this.duesPaid}}</td>
+      <td>
+        <select name="roster" disabled>
+          <option value="">Select a Roster</option>
+          {{#each @root.rosters}}
+          <option value="{{this.rosterId}}" {{selected this.rosterId ../this.roster}}>{{this.rosterName}}</option>
+          {{/each}}
+        </select>
+      </td>
+      <td><button name=" updateRoster">Edit</button></td>
+    </tr>
+    {{/each}}
   </table>
 </div>
