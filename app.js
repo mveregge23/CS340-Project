@@ -113,20 +113,24 @@ app.post("/players", function (req, res) {
 app.post("/player-search", function (req, res, next) {
   let context = {};
   context.title = "Players";
-  console.log(req.body.lastName)
-  mysql.pool.query("SELECT * FROM Players WHERE Players.lastName LIKE CONCAT(?, '%')", req.body.lastName, function (err, result) {
-    if (err) {
-      context.error = {
-        code: err.code,
-        sql: err.sql,
-        "sql-err": err.sqlMessage,
-      };
-      res.render("500", context);
-      return;
+  console.log(req.body.lastName);
+  mysql.pool.query(
+    "SELECT * FROM Players JOIN Rosters ON Players.roster=Rosters.rosterId WHERE Players.lastName LIKE CONCAT(?, '%')",
+    req.body.lastName,
+    function (err, result) {
+      if (err) {
+        context.error = {
+          code: err.code,
+          sql: err.sql,
+          "sql-err": err.sqlMessage,
+        };
+        res.render("500", context);
+        return;
+      }
+      context.results = result;
+      res.render("player-search", context);
     }
-    context.results = result;
-    res.render("player-search", context);
-  });
+  );
 });
 
 /*--Get roster table information--*/
@@ -436,9 +440,11 @@ app.use(function (err, req, res, next) {
 });
 
 app.listen(app.get("port"), function () {
-  "Express started on http://localhost:" +
-    app.get("port") +
-    " press Ctrl-C to terminate.";
+  console.log(
+    "Express started on http://localhost:" +
+      app.get("port") +
+      " press Ctrl-C to terminate."
+  );
 });
 
 //Handlebars helpers

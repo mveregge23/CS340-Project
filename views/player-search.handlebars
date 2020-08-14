@@ -1,17 +1,17 @@
- <table>
-      <tr>
-        <th>First Name</th>
-        <th>Last Name</th>
-        <th>Dues Paid?</th>
-        <th>Roster ID</th>
-      </tr>
-      
-      {{#each results}}
-      <tr>
-      <td>{{this.firstName}}</td>
-      <td>{{this.lastName}}</td>
-      <td>{{this.duesPaid}}</td>
-      <td>{{this.roster}}</td>
-      </tr>
-        {{/each}}
-  </table>
+<table>
+  <tr>
+    <th>First Name</th>
+    <th>Last Name</th>
+    <th>Dues Paid?</th>
+    <th>Roster Name</th>
+  </tr>
+
+  {{#each results}}
+  <tr>
+    <td>{{this.firstName}}</td>
+    <td>{{this.lastName}}</td>
+    <td>{{yesOrNo this.duesPaid}}</td>
+    <td>{{this.rosterName}}</td>
+  </tr>
+  {{/each}}
+</table>
