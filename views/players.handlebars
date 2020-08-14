@@ -26,6 +26,7 @@
     </tr>
     {{#each players}}
     <tr>
+      <input type="hidden" name="playerId" value="{{this.playerId}}">
       <td>{{this.firstName}}</td>
       <td>{{this.lastName}}</td>
       <td>{{yesOrNo this.duesPaid}}</td>
@@ -37,7 +38,7 @@
           {{/each}}
         </select>
       </td>
-      <td><button name=" updateRoster">Edit</button></td>
+      <td><button name="updateRoster">Edit</button></td>
     </tr>
     {{/each}}
   </table>

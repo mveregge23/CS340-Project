@@ -45,6 +45,7 @@ app.get("/index", function (req, res, next) {
 /*--Get rows of players--*/
 app.get("/players", function (req, res, next) {
   let context = {};
+  context.scripts = ["players.js"];
   context.title = "Players";
   mysql.pool.query(
     "SELECT * FROM Players JOIN Rosters ON Players.roster = Rosters.rosterId; SELECT Rosters.rosterName, Rosters.rosterId FROM Rosters;",
@@ -63,6 +64,29 @@ app.get("/players", function (req, res, next) {
       res.render("players", context);
     }
   );
+});
+
+app.put("/players", function (req, res, next) {
+  let context = {};
+  const updatePlayer = "UPDATE Players SET roster=? WHERE playerId=?;";
+  updateValues = [];
+  for (let val in req.body) {
+    updateValues.push(req.body[val] == "" ? null : req.body[val]);
+  }
+  mysql.pool.query(updatePlayer, updateValues, function (err, results) {
+    let context = {};
+    if (err) {
+      context.error = {
+        code: err.code,
+        sql: err.sql,
+        "sql-err": err.sqlMessage,
+      };
+      res.render(500, context);
+      return;
+    }
+
+    res.send("success");
+  });
 });
 
 /*--Insert new player to table--*/
